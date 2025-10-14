@@ -13,6 +13,23 @@ import uuid
 import subprocess
 import sys
 
+# Example text to test TTS
+test_line = "Hello world"
+
+try:
+    # --stdout prevents actual audio playback and writes WAV to a temp file
+    result = subprocess.run(
+        ["espeak", "-v", "en", test_line, "--stdout"],
+        capture_output=True,
+        check=True
+    )
+    # result.stdout contains the WAV bytes
+    print("✅ espeak executed successfully! WAV bytes length:", len(result.stdout))
+except subprocess.CalledProcessError as e:
+    print("❌ espeak failed:", e)
+except FileNotFoundError:
+    print("❌ espeak binary not found")
+
 
 
 app = Flask(__name__)
