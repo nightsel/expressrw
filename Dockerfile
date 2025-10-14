@@ -4,8 +4,8 @@ FROM python:3.10-slim
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
-    espeak \
-    libespeak-dev \
+    espeak-ng \
+    libespeak-ng-dev \
     ffmpeg \
     git \
     && rm -rf /var/lib/apt/lists/*
