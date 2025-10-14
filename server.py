@@ -67,6 +67,8 @@ def save_lyrics():
         response.raise_for_status()
 
         lyrics_text = response.text
+
+        print("Fetched lyrics:", lyrics_text)
         save_path = "/tmp/lyrics.txt"
         with open(save_path, "w", encoding="utf-8") as f:
             f.write(lyrics_text)
