@@ -9,6 +9,10 @@ import os
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return jsonify({"status": "ok", "message": "Python server is running"})
+
 def safe_temp_file(suffix):
     """Create a safe temporary file and return path"""
     tmp_file = NamedTemporaryFile(delete=False, suffix=suffix)
