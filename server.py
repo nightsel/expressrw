@@ -136,6 +136,9 @@ def align_song_full():
         lyrics_file = fetch_and_save_lyrics(lyrics_url)
         audio_file = fetch_and_save(audio_url, ".mp3")
         print("🎵 Lyrics and audio downloaded", file=sys.stderr)
+        new_content = "[instrumental]\n" + original
+        with open(lyrics_file, "w", encoding="utf-8") as f:
+            f.write(new_content)
 
         # 2️⃣ Convert MP3 -> WAV (mono, 16kHz, 16-bit)
         audio = AudioSegment.from_file(audio_file)
@@ -145,7 +148,7 @@ def align_song_full():
         print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
         print("Audio duration (ms):", len(audio), file=sys.stderr)
         with open(lyrics_file, "r", encoding="utf-8") as f:
-            print("Lyrics preview:", f.read(200), file=sys.stderr)   
+            print("Lyrics preview:", f.read(200), file=sys.stderr)
 
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
