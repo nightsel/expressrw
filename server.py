@@ -146,6 +146,7 @@ def align_song_full():
 
         # 2️⃣ Convert MP3 -> WAV (mono, 16kHz, 16-bit)
         audio = AudioSegment.from_file(audio_file)
+        audio = audio[:30000]  # first 30 seconds
         audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
         audio_wav_file = safe_temp_file(".wav")
         audio.export(audio_wav_file, format="wav", codec="pcm_s16le")
