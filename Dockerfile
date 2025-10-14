@@ -30,4 +30,4 @@ EXPOSE 5000
 ENV PORT=5000
 
 # Start server
-CMD gunicorn server:app --bind 0.0.0.0:$PORT
+CMD gunicorn server:app --bind 0.0.0.0:$PORT --timeout 300

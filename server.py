@@ -13,22 +13,7 @@ import uuid
 import subprocess
 import sys
 
-# Example text to test TTS
-test_line = "Hello world"
 
-try:
-    # --stdout prevents actual audio playback and writes WAV to a temp file
-    result = subprocess.run(
-        ["espeak", "-v", "en", test_line, "--stdout"],
-        capture_output=True,
-        check=True
-    )
-    # result.stdout contains the WAV bytes
-    print("✅ espeak executed successfully! WAV bytes length:", len(result.stdout), file=sys.stderr)
-except subprocess.CalledProcessError as e:
-    print("❌ espeak failed:", e, file=sys.stderr)
-except FileNotFoundError:
-    print("❌ espeak binary not found", file=sys.stderr)
 
 
 
