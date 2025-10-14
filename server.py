@@ -110,7 +110,7 @@ from aeneas.executetask import ExecuteTask
 from aeneas.task import Task
 from tempfile import NamedTemporaryFile
 import os
-
+"""
 # Function to split audio into chunks of max_duration_ms
 def split_audio(audio_path, max_duration_ms=30000):  # 30 sec chunks
     audio = AudioSegment.from_file(audio_path)
@@ -122,6 +122,7 @@ def split_audio(audio_path, max_duration_ms=30000):  # 30 sec chunks
         tmp.close()
         chunks.append(tmp.name)
     return chunks
+
 
 # Split your WAV into smaller chunks
 chunks = split_audio(wav_file.name)
@@ -154,7 +155,7 @@ for i, chunk_path in enumerate(chunks):
         sync_maps.append(task.sync_map_file_path_absolute)
     except Exception as e:
         print(f"Error aligning chunk {i}: {e}")
-
+"""
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
