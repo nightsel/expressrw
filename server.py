@@ -129,7 +129,7 @@ def align_song_full():
 
         with open(sync_file, "r", encoding="utf-8") as f:
             sync_data = json.load(f)
-
+        print(sync_data)
         return jsonify({"status": "ok", "sync_map": sync_data})
 
     except requests.RequestException as e:
