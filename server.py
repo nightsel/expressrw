@@ -78,22 +78,28 @@ def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
     res.raise_for_status()
     data = res.json()
 
-    # Handle JSON structure like {"lines": ["line1", "line2", ...]}
     all_lines = []
+
     if isinstance(data, dict) and "lines" in data:
         for line in data["lines"]:
-            # split any embedded newlines into separate lines
-            all_lines.extend(line.splitlines())
+            # Normalize line endings to \n
+            normalized = line.replace("\r\n", "\n").replace("\r", "\n")
+            # Split strictly on \n to get all visual lines
+            split_lines = normalized.split("\n")
+            # Remove zero-width spaces and strip whitespace
+            clean_lines = [l.replace("\u200B", "").strip() for l in split_lines if l.strip()]
+            all_lines.extend(clean_lines)
     else:
-        # fallback: convert whatever came back to string, split lines
-        all_lines = str(data).splitlines()
+        # Fallback for unexpected JSON structure
+        text = str(data).replace("\r\n", "\n").replace("\r", "\n")
+        all_lines = [l.replace("\u200B", "").strip() for l in text.split("\n") if l.strip()]
 
-    # Join lines with standard \n for consistent line endings
-    text = "\n".join(all_lines)
+    # Join lines with consistent \n endings
+    final_text = "\n".join(all_lines)
 
     tmp_path = safe_temp_file(suffix)
     with open(tmp_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(text)
+        f.write(final_text)
 
     print(f"Saved lyrics to {tmp_path}. Total lines: {len(all_lines)}")
     return tmp_path
