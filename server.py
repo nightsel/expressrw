@@ -136,7 +136,7 @@ def align_song_full():
     try:
         # 1️⃣ Fetch and save lyrics and audio
         lyrics_file = fetch_and_save_lyrics(lyrics_url)
-        audio_file = fetch_and_save(audio_url, ".mp3")
+        audio_file = fetch_and_save(audio_url, ".wav")
         print("🎵 Lyrics and audio downloaded", file=sys.stderr)
         with open(lyrics_file, "r", encoding="utf-8") as f:
             original = f.read()
@@ -144,10 +144,7 @@ def align_song_full():
         with open(lyrics_file, "w", encoding="utf-8") as f:
             f.write(new_content)
 
-        # 2️⃣ Convert MP3 -> WAV (mono, 16kHz, 16-bit)
-        audio = AudioSegment.from_file(audio_file)
-        audio = audio[:30000]  # first 30 seconds
-        audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
+        audio = audio_file;
         audio_wav_file = safe_temp_file(".wav")
         audio.export(audio_wav_file, format="wav", codec="pcm_s16le")
         print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
