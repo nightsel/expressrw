@@ -164,9 +164,7 @@ def align_song_full():
         print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
         print("Audio duration (ms):", len(audio), file=sys.stderr)
         with open(lyrics_file, "r", encoding="utf-8") as f:
-            text = f.read()
-            print("Lyrics preview:", text, file=sys.stderr)
-            lines = text.splitlines()  # splits on \n, \r\n, or \r
+            lines = f.readlines()  # splits on \n, \r\n, or \r
 
         print("Total lines:", len(lines), file=sys.stderr)
 
