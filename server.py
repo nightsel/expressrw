@@ -135,6 +135,9 @@ def align_song_full():
         print("🎵 Files downloaded successfully", file=sys.stderr)
         print("🔧 Running Aeneas alignment...", file=sys.stderr)
         ExecuteTask(task).execute()
+        with open(sync_file, "r", encoding="utf-8") as f:
+            contents = f.read()
+        print("SYNC FILE CONTENTS:", contents or "<EMPTY>", file=sys.stderr)
         print("✅ Aeneas finished executing", file=sys.stderr)
         if not os.path.exists(sync_file):
             print("❌ Sync file missing", file=sys.stderr)
