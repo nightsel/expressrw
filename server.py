@@ -12,8 +12,7 @@ import threading
 import uuid
 import subprocess
 
-print(subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True).stdout)
-print(subprocess.run(["espeak", "--version"], capture_output=True, text=True).stdout)
+
 
 app = Flask(__name__)
 
@@ -211,5 +210,7 @@ import os
 
 
 if __name__ == "__main__":
+
+    print("🚀 Server started successfully.")
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
