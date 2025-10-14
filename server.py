@@ -156,6 +156,8 @@ def align_song_full():
         print("Audio duration (ms):", len(audio), file=sys.stderr)
         with open(lyrics_file, "r", encoding="utf-8") as f:
             print("Lyrics preview:", f.read(200), file=sys.stderr)
+            lines = f.readlines()
+        print("Total lines:", len(lines))
 
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
