@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Audio + Waveform</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 50px; }
+    textarea, input { width: 100%; }
+    textarea { height: 100px; margin-bottom: 10px; }
+    button { margin-top: 10px; padding: 5px 10px; }
+    .result { margin-top: 20px; font-weight: bold; }
+    canvas { display: block; margin-top: 20px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+
+  <h2>Download Audio</h2>
+  <input type="text" id="audioUrl" placeholder="Enter audio URL (e.g., SoundCloud, other direct links)">
+  <p style="color: red; font-size: 0.9em;">
+    Note: YouTube links will not work due to anti-bot protections. Please use other sources. Be careful with the volume.
+  </p>
+  <button id="downloadBtn" onclick="downloadAudio()">Download Audio</button>
+
+  <audio id="audioPlayer" controls>
+      <source id="audioSource" type="audio/mpeg">
+  </audio>
+
+<h2>Waveform (clickable)</h2>
+<canvas id="waveformCanvas" width="1000" height="200"></canvas>
+
+<h2>Frequency Spectrum</h2>
+<canvas id="canvas2" width="1000" height="200"></canvas>
+
+
+
+<script>
+const audio = document.getElementById("audioPlayer");
+const audioSource = document.getElementById("audioSource");
+
+const waveformCanvas = document.getElementById("waveformCanvas");
+const waveformCtx = waveformCanvas.getContext("2d");
+const freqCanvas = document.getElementById("canvas2");
+const freqCtx = freqCanvas.getContext("2d");
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioCtx.createAnalyser();
+analyser.fftSize = 2048;
+let source = null;
+let waveformData = null;
+audio.volume = 0.5; // 50%
+const numBuckets = 10;
+
+
+// Only create the MediaElementSource once
+if (!source) {
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+}
+
+// --- Downsample waveform helper ---
+function downsampleWaveform(data, width) {
+    const factor = Math.floor(data.length / width);
+    const downsampled = [];
+
+    for (let i = 0; i < width; i++) {
+        const slice = data.slice(i * factor, (i + 1) * factor);
+        let sumSquares = slice.reduce((sum, v) => sum + v*v, 0);
+        const rms = Math.sqrt(sumSquares / slice.length);
+        downsampled.push({ min: -rms, max: rms });
+    }
+
+    const maxVal = Math.max(...downsampled.map(d => d.max));
+    const minVal = Math.min(...downsampled.map(d => d.min));
+
+    return downsampled.map(({min, max}) => ({
+        min: (min - minVal) / (maxVal - minVal) * 2 - 1,
+        max: (max - minVal) / (maxVal - minVal) * 2 - 1
+    }));
+}
+
+// --- Animate waveform ---
+function animateWaveform() {
+    if (!waveformData || !audio.duration) return requestAnimationFrame(animateWaveform);
+
+    waveformCtx.clearRect(0, 0, waveformCanvas.width, waveformCanvas.height);
+    const middleY = waveformCanvas.height / 2;
+    const amplitude = middleY;
+    const progressX = Math.floor(audio.currentTime / audio.duration * waveformCanvas.width);
+
+    for (let x = 0; x < waveformData.length; x++) {
+        const { min, max } = waveformData[x];
+        const y1 = middleY - max * amplitude;
+        const y2 = middleY - min * amplitude;
+        waveformCtx.fillStyle = x < progressX ? "#4caf50" : "#ccc";
+        waveformCtx.fillRect(x, Math.min(y1, y2), 1, Math.abs(y2 - y1));
+    }
+
+    requestAnimationFrame(animateWaveform);
+}
+
+// --- Draw frequency spectrum ---
+function drawFrequencies() {
+    const floatArray = new Float32Array(analyser.frequencyBinCount);
+    analyser.getFloatFrequencyData(floatArray); // dB values
+
+    freqCtx.clearRect(0, 0, freqCanvas.width, freqCanvas.height);
+    const barWidth = freqCanvas.width / numBuckets;
+
+    const sampleRate = audioCtx.sampleRate;
+    const fftSize = analyser.fftSize;
+    const binFreq = sampleRate / fftSize;
+    const minFreq = 20;
+    const maxFreq = 20000;
+
+    for (let i = 0; i < numBuckets; i++) {
+        const freqStart = minFreq * Math.pow(maxFreq / minFreq, i / numBuckets);
+        const freqEnd   = minFreq * Math.pow(maxFreq / minFreq, (i + 1) / numBuckets);
+        const startBin = Math.floor(freqStart / binFreq);
+        const endBin = Math.min(Math.floor(freqEnd / binFreq), floatArray.length - 1);
+
+        let sumDB = 0;
+        for (let j = startBin; j <= endBin; j++) sumDB += floatArray[j];
+        const avgDB = sumDB / (endBin - startBin + 1);
+
+        const minDB = -80;
+        const maxDB = 0;
+        let val = (avgDB - minDB) / (maxDB - minDB);
+        val = Math.max(0, Math.min(1, val));
+
+        const barHeight = val * freqCanvas.height;
+        freqCtx.fillStyle = "#4caf50";
+        freqCtx.fillRect(i * barWidth, freqCanvas.height - barHeight, barWidth - 2, barHeight);
+    }
+
+    requestAnimationFrame(drawFrequencies);
+}
+
+// --- Download audio ---
+async function downloadAudio() {
+
+    const audioUrl = document.getElementById("audioUrl").value.trim();
+    if (!audioUrl) return alert("Please enter an audio URL");
+
+    const res = await fetch(`/download-audio?url=${encodeURIComponent(audioUrl)}`);
+    const data = await res.json();
+    if (data.error) return alert("Error: " + data.error);
+
+    const proxiedUrl = `/proxy-audio?url=${encodeURIComponent(data.url)}`;
+
+    // Decode waveform before assigning src
+    const arrayBuffer = await (await fetch(proxiedUrl)).arrayBuffer();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+    waveformData = downsampleWaveform(audioBuffer.getChannelData(0), waveformCanvas.width);
+
+    // Assign src only after decoding
+    audioSource.src = proxiedUrl;
+    audio.load(); // ensures native UI updates correctly
+}
+
+// Make audio  clickable to jump to any point
+waveformCanvas.addEventListener("click", (e) => {
+    const rect = waveformCanvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = clickX / waveformCanvas.width;
+    audio.currentTime = percentage * audio.duration;
+});
+
+
+
+// --- Play audio safely ---
+audio.addEventListener("play", async () => {
+    if (audioCtx.state === "suspended") await audioCtx.resume();
+    animateWaveform();
+    drawFrequencies();
+});
+</script>
+
+<h1>Sentiment Checker</h1>
+<textarea id="textInput" placeholder="Type your text here..."></textarea>
+<br>
+<button onclick="checkSentiment()">Check Sentiment</button>
+<div class="result" id="result"></div>
+
+<script>
+async function checkSentiment() {
+  const text = document.getElementById("textInput").value;
+  if (!text) return alert("Please enter some text.");
+
+  const response = await fetch("/sentiment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+
+  const data = await response.json();
+  document.getElementById("result").innerHTML =
+    `Score: ${data.score} <br>
+     Comparative: ${data.comparative} <br>
+     Words: ${data.words.join(", ")}`;
+}
+</script>
+
+</body>
+</html>
