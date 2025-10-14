@@ -143,8 +143,13 @@ def align_song_full():
         new_content = "[instrumental]\n" + original
         with open(lyrics_file, "w", encoding="utf-8") as f:
             f.write(new_content)
+        # load into AudioSegment
+        audio = AudioSegment.from_file(audio_file)
 
-        audio = audio_file;
+        # convert to mono, 16kHz, 16-bit
+        audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
+
+        # export to temp WAV for Aeneas
         audio_wav_file = safe_temp_file(".wav")
         audio.export(audio_wav_file, format="wav", codec="pcm_s16le")
         print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
