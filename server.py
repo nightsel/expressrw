@@ -10,6 +10,10 @@ import os
 import time
 import threading
 import uuid
+import subprocess
+
+print(subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True).stdout)
+print(subprocess.run(["espeak", "--version"], capture_output=True, text=True).stdout)
 
 app = Flask(__name__)
 
