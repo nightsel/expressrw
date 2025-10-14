@@ -136,6 +136,8 @@ def align_song_full():
         lyrics_file = fetch_and_save_lyrics(lyrics_url)
         audio_file = fetch_and_save(audio_url, ".mp3")
         print("🎵 Lyrics and audio downloaded", file=sys.stderr)
+        with open(lyrics_file, "r", encoding="utf-8") as f:
+            original = f.read()
         new_content = "[instrumental]\n" + original
         with open(lyrics_file, "w", encoding="utf-8") as f:
             f.write(new_content)
