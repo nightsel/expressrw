@@ -18,7 +18,7 @@ COPY requirements_aeneas.txt requirements.txt ./
 
 # Upgrade pip and install Python packages
 RUN pip install --upgrade pip setuptools wheel \
-    && pip install numpy \
+    && pip install "numpy<1.24" \
     && pip install --no-build-isolation -r requirements_aeneas.txt \
     && pip install -r requirements.txt
 
