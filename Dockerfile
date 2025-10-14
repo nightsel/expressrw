@@ -27,4 +27,4 @@ COPY . .
 
 # Default command to run your app
 EXPOSE 5000
-CMD sh -c "gunicorn server:app --bind 0.0.0.0:${PORT:-5000}"
+CMD gunicorn server:app --bind 0.0.0.0:$PORT
