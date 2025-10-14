@@ -84,24 +84,22 @@ def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
         for line in data["lines"]:
             # Normalize line endings to \n
             normalized = line.replace("\r\n", "\n").replace("\r", "\n")
-            # Split strictly on \n to get all visual lines
+            # Split on \n to get all visual lines
             split_lines = normalized.split("\n")
             # Remove zero-width spaces and strip whitespace
             clean_lines = [l.replace("\u200B", "").strip() for l in split_lines if l.strip()]
             all_lines.extend(clean_lines)
     else:
-        # Fallback for unexpected JSON structure
+        # Fallback for unexpected JSON
         text = str(data).replace("\r\n", "\n").replace("\r", "\n")
         all_lines = [l.replace("\u200B", "").strip() for l in text.split("\n") if l.strip()]
 
-    # Join lines with consistent \n endings
-    final_text = "\n".join(all_lines)
-
+    # Write all visual lines with consistent \n endings
     tmp_path = safe_temp_file(suffix)
     with open(tmp_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(final_text)
+        f.write("\n".join(all_lines))
 
-    print(f"Saved lyrics to {tmp_path}. Total lines: {len(all_lines)}")
+    print(f"Saved lyrics to {tmp_path}. Total visual lines: {len(all_lines)}")
     return tmp_path
 
 
