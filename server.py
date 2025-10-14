@@ -11,6 +11,7 @@ import time
 import threading
 import uuid
 import subprocess
+import sys
 
 
 
@@ -108,6 +109,7 @@ def align_song_full():
     }
     Returns: JSON of aligned lyrics
     """
+    print("📩 Got /align_song_full request", file=sys.stderr)
     data = request.json
     lyrics_url = data.get("lyrics_url")
     audio_url = data.get("audio_url")
@@ -132,6 +134,7 @@ def align_song_full():
         print("Running Aeneas with:")
         print("Audio:", audio_wav_file, os.path.exists(audio_wav_file), os.path.getsize(audio_wav_file))
         print("Lyrics:", lyrics_file, os.path.exists(lyrics_file), os.path.getsize(lyrics_file))
+
         ExecuteTask(task).execute()
         print("Sync file size:", os.path.getsize(sync_file))
         with open(sync_file, "r", encoding="utf-8") as f:
