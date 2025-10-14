@@ -144,7 +144,7 @@ def align_song_full():
 
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
-        task = Task(config_string="task_language=en|is_text_type=plain|os_task_file_format=json|use_pure_python=True")
+        task = Task(config_string = "task_language=en|is_text_type=plain|os_task_file_format=json")
         task.audio_file_path_absolute = audio_wav_file
         task.text_file_path_absolute = lyrics_file
         task.sync_map_file_path_absolute = sync_file
@@ -152,6 +152,7 @@ def align_song_full():
         print("🎵 Files downloaded successfully", file=sys.stderr)
         print("🔧 Running Aeneas alignment...", file=sys.stderr)
         ExecuteTask(task).execute()
+        task.output_sync_map_file(sync_map_file)
         with open(sync_file, "r", encoding="utf-8") as f:
             contents = f.read()
         print("SYNC FILE CONTENTS:", contents or "<EMPTY>", file=sys.stderr)
