@@ -130,11 +130,13 @@ def align_song_full():
         task.audio_file_path_absolute = audio_wav_file
         task.text_file_path_absolute = lyrics_file
         task.sync_map_file_path_absolute = sync_file
-        print(audio_file, os.path.exists(audio_file))
-        print(lyrics_file, os.path.exists(lyrics_file))
-        assert os.path.exists(audio_wav_file), f"WAV not found: {audio_wav_file}"
-        assert os.path.exists(lyrics_file), f"Lyrics not found: {lyrics_file}"
+        print("Running Aeneas with:")
+        print("Audio:", audio_wav_file, os.path.exists(audio_wav_file), os.path.getsize(audio_wav_file))
+        print("Lyrics:", lyrics_file, os.path.exists(lyrics_file), os.path.getsize(lyrics_file))
         ExecuteTask(task).execute()
+        print("Sync file size:", os.path.getsize(sync_file))
+        with open(sync_file, "r", encoding="utf-8") as f:
+            print("Sync file raw content:", f.read())
 
         with open(sync_file, "r", encoding="utf-8") as f:
             sync_data = json.load(f)
