@@ -77,7 +77,8 @@ def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
     res = requests.get(lyrics_url)
     res.raise_for_status()
     data = res.json()
-
+    for i, line in enumerate(data["lines"]):
+        print(i, repr(line), "split lines:", len(line.splitlines()), file=sys.stderr)
     # Expect structure like: {"lines": ["line1", "line2", ...]}
     if isinstance(data, dict) and "lines" in data:
         text = "\n".join(data["lines"])
