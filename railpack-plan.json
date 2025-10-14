@@ -1,0 +1,13 @@
+{
+  "build": [
+    "pip install -r requirements.txt",
+    "npm install"
+  ],
+  "copy": [
+    {
+      "source": "./",
+      "destination": "/app"
+    }
+  ],
+  "start": "npm start"
+}
