@@ -77,17 +77,25 @@ def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
     res = requests.get(lyrics_url)
     res.raise_for_status()
     data = res.json()
-    for i, line in enumerate(data["lines"]):
-        print(i, repr(line), "split lines:", len(line.splitlines()), file=sys.stderr)
-    # Expect structure like: {"lines": ["line1", "line2", ...]}
+
+    # Handle JSON structure like {"lines": ["line1", "line2", ...]}
+    all_lines = []
     if isinstance(data, dict) and "lines" in data:
-        text = "\n".join(data["lines"])
+        for line in data["lines"]:
+            # split any embedded newlines into separate lines
+            all_lines.extend(line.splitlines())
     else:
-        text = str(data)
+        # fallback: convert whatever came back to string, split lines
+        all_lines = str(data).splitlines()
+
+    # Join lines with standard \n for consistent line endings
+    text = "\n".join(all_lines)
 
     tmp_path = safe_temp_file(suffix)
-    with open(tmp_path, "w", encoding="utf-8") as f:
+    with open(tmp_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
+
+    print(f"Saved lyrics to {tmp_path}. Total lines: {len(all_lines)}")
     return tmp_path
 
 
