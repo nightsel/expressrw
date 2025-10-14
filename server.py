@@ -80,27 +80,25 @@ def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
 
     all_lines = []
 
-    # Process JSON lines
     if isinstance(data, dict) and "lines" in data:
         for line in data["lines"]:
-            # Split embedded line breaks (\n, \r\n, \r)
-            split_lines = line.replace("\r\n", "\n").replace("\r", "\n").split("\n")
-            # Remove zero-width spaces and strip whitespace
-            clean_lines = [l.replace("\u200B", "").strip() for l in split_lines if l.strip()]
+            # Split embedded line breaks but keep them, so writelines preserves them
+            split_lines = line.splitlines(keepends=True)
+            # Optionally clean zero-width spaces and trailing whitespace per line
+            clean_lines = [l.replace("\u200B", "").rstrip() + "\n" for l in split_lines if l.strip()]
             all_lines.extend(clean_lines)
     else:
-        # Fallback: convert to string, normalize line breaks
-        text = str(data).replace("\r\n", "\n").replace("\r", "\n")
-        all_lines = [l.replace("\u200B", "").strip() for l in text.split("\n") if l.strip()]
+        text = str(data)
+        split_lines = text.splitlines(keepends=True)
+        all_lines = [l.replace("\u200B", "").rstrip() + "\n" for l in split_lines if l.strip()]
 
-    # Write all visual lines with consistent \n endings
     tmp_path = safe_temp_file(suffix)
-    with open(tmp_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write("\n".join(all_lines))
+    # Write lines exactly as list, Python will preserve them for readlines()
+    with open(tmp_path, "w", encoding="utf-8", newline='') as f:
+        f.writelines(all_lines)
 
-    print(f"Saved lyrics to {tmp_path}. Total visual lines: {len(all_lines)}")
+    print(f"Saved lyrics to {tmp_path}. Total lines (readlines() compatible): {len(all_lines)}")
     return tmp_path
-
 
 @app.route("/save_lyrics", methods=["GET", "POST"])
 def save_lyrics():
