@@ -131,6 +131,7 @@ def align_song_full():
         task.audio_file_path_absolute = audio_wav_file
         task.text_file_path_absolute = lyrics_file
         task.sync_map_file_path_absolute = sync_file
+        print(open(lyrics_file, encoding="utf-8").read(), file=sys.stderr)
         print("🎵 Files downloaded successfully", file=sys.stderr)
         print("🔧 Running Aeneas alignment...", file=sys.stderr)
         ExecuteTask(task).execute()
