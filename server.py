@@ -144,6 +144,8 @@ def align_song_full():
         audio.export(audio_wav_file, format="wav", codec="pcm_s16le")
         print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
         print("Audio duration (ms):", len(audio), file=sys.stderr)
+        with open(lyrics_file, "r", encoding="utf-8") as f:
+            print("Lyrics preview:", f.read(200), file=sys.stderr)   
 
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
