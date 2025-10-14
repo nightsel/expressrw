@@ -4,5 +4,3 @@ numpy>=1.9
 flask
 gunicorn
 requests
-numpy
-aeneas
