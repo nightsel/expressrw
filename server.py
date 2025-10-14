@@ -16,12 +16,15 @@ def home():
 
 @app.route("/download_audio", methods=["POST"])
 def download_audio():
-    url = request.json["https://expressproject-al0i.onrender.com/luna"]
+    data = request.get_json()
+    url = data["url"]  # <-- correct way
     response = requests.get(url)
+
     file_path = "/tmp/audio.mp3"
     with open(file_path, "wb") as f:
         f.write(response.content)
-    return {"message": "Downloaded successfully", "path": file_path}
+
+    return jsonify({"message": "Downloaded successfully", "path": file_path})
 
 def safe_temp_file(suffix):
     """Create a safe temporary file and return path"""
