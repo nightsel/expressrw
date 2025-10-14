@@ -19,18 +19,19 @@ TMP_DIR = "/tmp"
 CLEAN_INTERVAL = 15 * 60  # 15 minutes
 
 def cleanup_tmp():
-    while True:
-        for f in os.listdir(TMP_DIR):
+    tmp_dir = "/tmp"
+    for f in os.listdir(tmp_dir):
+        if f.startswith("audio_") or f.endswith(".txt"):
             try:
-                path = os.path.join(TMP_DIR, f)
-                if os.path.isfile(path):
-                    os.remove(path)
-            except Exception as e:
-                print(f"Failed to remove {f}: {e}")
-        time.sleep(CLEAN_INTERVAL)
+                os.remove(os.path.join(tmp_dir, f))
+            except:
+                pass
+    # schedule next cleanup
+    threading.Timer(900, cleanup_tmp).start()  # 900 sec = 15 min
+
 
 # Start the cleanup thread when the app starts
-threading.Thread(target=cleanup_tmp, daemon=True).start()
+cleanup_tmp()
 
 @app.route("/download_audio", methods=["POST"])
 def download_audio():
@@ -45,11 +46,34 @@ def download_audio():
     except Exception as e:
         return jsonify({"status": "error", "error": str(e)})
 
-def safe_temp_file(suffix):
-    """Create a safe temporary file and return path"""
+def safe_temp_file(suffix=".txt"):
     tmp_file = NamedTemporaryFile(delete=False, suffix=suffix)
     tmp_file.close()
     return tmp_file.name
+
+@app.route("/save_lyrics", methods=["POST"])
+def save_lyrics():
+    # The URL of your JS lyrics route
+    lyrics_url = request.json.get("url")
+    if not lyrics_url:
+        return jsonify({"status": "error", "message": "No URL provided"}), 400
+
+    try:
+        res = requests.get(lyrics_url)
+        res.raise_for_status()
+        # Assume the response is a JSON array of strings
+        lyrics_lines = res.json()  # e.g., ["line 1", "line 2", ...]
+        if not isinstance(lyrics_lines, list) or not all(isinstance(l, str) for l in lyrics_lines):
+            return jsonify({"status": "error", "message": "Unexpected response format"}), 500
+    except requests.RequestException as e:
+        return jsonify({"status": "error", "message": f"Failed to fetch lyrics: {e}"}), 500
+
+    # Save lyrics to a temporary text file
+    tmp_path = safe_temp_file(".txt")
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lyrics_lines))
+
+    return jsonify({"status": "ok", "path": tmp_path, "lines_saved": len(lyrics_lines)})
 
 def chunk_lyrics(lyrics_lines, max_words=20):
     """Split lyrics into chunks of max_words"""
