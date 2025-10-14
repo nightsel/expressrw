@@ -153,7 +153,7 @@ def align_song_full():
         print("🔧 Running Aeneas alignment...", file=sys.stderr)
 
         ExecuteTask(task).execute()
-        task.output_sync_map_file(sync_map_file)
+        task.output_sync_map_file(sync_file)
         with open(sync_file, "r", encoding="utf-8") as f:
             contents = f.read()
         print("SYNC FILE CONTENTS:", contents or "<EMPTY>", file=sys.stderr)
