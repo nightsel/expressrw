@@ -79,20 +79,17 @@ def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
     data = res.json()
 
     all_lines = []
-    for i, line in enumerate(data["lines"]):
-        print(i, repr(line), "split lines:", len(line.splitlines()))
 
+    # Process JSON lines
     if isinstance(data, dict) and "lines" in data:
         for line in data["lines"]:
-            # Normalize line endings to \n
-            normalized = line.replace("\r\n", "\n").replace("\r", "\n")
-            # Split on \n to get all visual lines
-            split_lines = normalized.split("\n")
+            # Split embedded line breaks (\n, \r\n, \r)
+            split_lines = line.replace("\r\n", "\n").replace("\r", "\n").split("\n")
             # Remove zero-width spaces and strip whitespace
             clean_lines = [l.replace("\u200B", "").strip() for l in split_lines if l.strip()]
             all_lines.extend(clean_lines)
     else:
-        # Fallback for unexpected JSON
+        # Fallback: convert to string, normalize line breaks
         text = str(data).replace("\r\n", "\n").replace("\r", "\n")
         all_lines = [l.replace("\u200B", "").strip() for l in text.split("\n") if l.strip()]
 
