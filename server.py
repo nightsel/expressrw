@@ -16,13 +16,16 @@ def home():
 
 @app.route("/download_audio", methods=["POST"])
 def download_audio():
-    url = request.json["url"]
-    response = requests.get(url)
-    response.raise_for_status()
-    file_path = "/tmp/audio.mp3"
-    with open(file_path, "wb") as f:
-        f.write(response.content)
-    return jsonify({"message": "Downloaded successfully", "path": file_path})
+    try:
+        url = request.json["url"]
+        response = requests.get(url)
+        response.raise_for_status()
+        file_path = "/tmp/audio.mp3"
+        with open(file_path, "wb") as f:
+            f.write(response.content)
+        return jsonify({"message": "Downloaded successfully", "path": file_path})
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)})
 
 def safe_temp_file(suffix):
     """Create a safe temporary file and return path"""
