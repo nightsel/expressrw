@@ -151,6 +151,7 @@ def align_song_full():
         print(open(lyrics_file, encoding="utf-8").read(), file=sys.stderr)
         print("🎵 Files downloaded successfully", file=sys.stderr)
         print("🔧 Running Aeneas alignment...", file=sys.stderr)
+        print(subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True).stdout, file=sys.stderr)
         ExecuteTask(task).execute()
         task.output_sync_map_file(sync_map_file)
         with open(sync_file, "r", encoding="utf-8") as f:
