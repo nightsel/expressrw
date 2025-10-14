@@ -24,11 +24,11 @@ try:
         check=True
     )
     # result.stdout contains the WAV bytes
-    print("✅ espeak executed successfully! WAV bytes length:", len(result.stdout))
+    print("✅ espeak executed successfully! WAV bytes length:", len(result.stdout), file=sys.stderr)
 except subprocess.CalledProcessError as e:
-    print("❌ espeak failed:", e)
+    print("❌ espeak failed:", e, file=sys.stderr)
 except FileNotFoundError:
-    print("❌ espeak binary not found")
+    print("❌ espeak binary not found", file=sys.stderr)
 
 
 
