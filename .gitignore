@@ -37,6 +37,5 @@ debian/
 docs/
 thirdparty/
 pyinstaller-*
-aeneas_check_setup.py
 check_dependencies.py
 run_all_unit_tests.py
