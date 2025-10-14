@@ -79,6 +79,8 @@ def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
     data = res.json()
 
     all_lines = []
+    for i, line in enumerate(data["lines"]):
+        print(i, repr(line), "split lines:", len(line.splitlines()))
 
     if isinstance(data, dict) and "lines" in data:
         for line in data["lines"]:
@@ -158,7 +160,6 @@ def align_song_full():
             f.write(new_content)
         # load into AudioSegment
         audio = AudioSegment.from_file(audio_file)
-
         # convert to mono, 16kHz, 16-bit
         audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
 
@@ -168,7 +169,7 @@ def align_song_full():
         print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
         print("Audio duration (ms):", len(audio), file=sys.stderr)
         with open(lyrics_file, "r", encoding="utf-8") as f:
-            print("Lyrics preview:", f.read(200), file=sys.stderr)
+            print("Lyrics preview:", f.read(), file=sys.stderr)
             lines = f.readlines()
         print("Total lines:", len(lines), file=sys.stderr)
 
