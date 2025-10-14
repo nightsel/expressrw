@@ -1,10 +1,9 @@
 # Base image
-FROM python:3.10-slim
+FROM python:3.10
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
-    python3-venv \
     espeak-ng \
     libespeak-ng-dev \
     ffmpeg \
@@ -26,6 +25,5 @@ RUN pip install --upgrade pip setuptools wheel \
 # Copy application code
 COPY . .
 
-# Default command to run your app
 EXPOSE 5000
 CMD gunicorn server:app --bind 0.0.0.0:$PORT
