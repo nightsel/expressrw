@@ -51,7 +51,7 @@ def safe_temp_file(suffix=".txt"):
     tmp_file.close()
     return tmp_file.name
 
-@app.route("/save_lyrics", methods=["POST"])
+@app.route("/save_lyrics", methods=["GET", "POST"])
 def save_lyrics():
     # The URL of your JS lyrics route
     lyrics_url = request.json.get("url")
