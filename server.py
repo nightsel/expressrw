@@ -135,53 +135,49 @@ def align_song_full():
         # 1️⃣ Fetch and save lyrics and audio
         lyrics_file = fetch_and_save_lyrics(lyrics_url)
         audio_file = fetch_and_save(audio_url, ".mp3")
+        print("🎵 Lyrics and audio downloaded", file=sys.stderr)
 
-        # 2️⃣ Convert MP3 -> WAV (mono, 16kHz)
+        # 2️⃣ Convert MP3 -> WAV (mono, 16kHz, 16-bit)
         audio = AudioSegment.from_file(audio_file)
         audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
         audio_wav_file = safe_temp_file(".wav")
         audio.export(audio_wav_file, format="wav", codec="pcm_s16le")
+        print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
 
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
-        task = Task(config_string = "task_language=en|is_text_type=plain|os_task_file_format=json")
+        task = Task(config_string="task_language=en|is_text_type=plain|os_task_file_format=json")
         task.audio_file_path_absolute = audio_wav_file
         task.text_file_path_absolute = lyrics_file
         task.sync_map_file_path_absolute = sync_file
-        print(open(lyrics_file, encoding="utf-8").read(), file=sys.stderr)
-        print("🎵 Files downloaded successfully", file=sys.stderr)
-        print("🔧 Running Aeneas alignment...", file=sys.stderr)
 
+        print("🔧 Running Aeneas alignment...", file=sys.stderr)
         ExecuteTask(task).execute()
-        task.output_sync_map_file(sync_file)
-        with open(sync_file, "r", encoding="utf-8") as f:
-            contents = f.read()
-        print("SYNC FILE CONTENTS:", contents or "<EMPTY>", file=sys.stderr)
         print("✅ Aeneas finished executing", file=sys.stderr)
+
+        # 4️⃣ Read and parse sync file
         if not os.path.exists(sync_file):
             print("❌ Sync file missing", file=sys.stderr)
+            return jsonify({"status": "error", "message": "Sync file was not created"})
         elif os.path.getsize(sync_file) == 0:
             print("⚠️ Sync file is empty", file=sys.stderr)
-        else:
-            with open(sync_file, "r", encoding="utf-8") as f:
-                try:
-                    raw = f.read()
-                    print("📜 Sync file content preview:", raw[:200], file=sys.stderr)
-                    json.loads(raw)
-                except Exception as e:
-                    print("⚠️ Failed to parse sync JSON:", e, file=sys.stderr)
-        with open(sync_file, "r", encoding="utf-8") as f:
-            print("Sync file raw content:", f.read())
+            return jsonify({"status": "error", "message": "Sync file is empty"})
 
         with open(sync_file, "r", encoding="utf-8") as f:
-            sync_data = json.load(f)
-        print(sync_data)
+            raw = f.read()
+            print("📜 Sync file content preview:", raw[:200], file=sys.stderr)
+            sync_data = json.loads(raw)
+
+        print("🗂 Sync map loaded successfully", file=sys.stderr)
         return jsonify({"status": "ok", "sync_map": sync_data})
 
     except requests.RequestException as e:
+        print(f"❌ Failed to fetch files: {e}", file=sys.stderr)
         return jsonify({"status": "error", "message": f"Failed to fetch: {e}"})
     except Exception as e:
+        print(f"⚠️ Alignment failed: {e}", file=sys.stderr)
         return jsonify({"status": "error", "message": f"Alignment failed: {e}"})
+
 
 
 @app.route("/align")
