@@ -26,4 +26,5 @@ RUN pip install --upgrade pip setuptools wheel \
 COPY . .
 
 # Default command to run your app
-CMD gunicorn server:app --bind 0.0.0.0:$PORT
+EXPOSE 5000
+CMD sh -c "gunicorn server:app --bind 0.0.0.0:${PORT:-5000}"
