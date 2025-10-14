@@ -170,7 +170,7 @@ def align_song_full():
 
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
-        task = Task(config_string="task_language=en|is_text_type=plain|os_task_file_format=json")
+        task = Task(config_string="task_language=eng|is_text_type=plain|os_task_file_format=json|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=50|task_log_level=debug")
         task.audio_file_path_absolute = audio_wav_file
         task.text_file_path_absolute = lyrics_file
         task.sync_map_file_path_absolute = sync_file
