@@ -71,6 +71,23 @@ def fetch_and_save(url, suffix):
         f.write(response.content if mode=="wb" else response.text)
     return tmp_path
 
+def fetch_and_save_lyrics(lyrics_url, suffix=".txt"):
+    res = requests.get(lyrics_url)
+    res.raise_for_status()
+    data = res.json()
+
+    # Expect structure like: {"lines": ["line1", "line2", ...]}
+    if isinstance(data, dict) and "lines" in data:
+        text = "\n".join(data["lines"])
+    else:
+        text = str(data)
+
+    tmp_path = safe_temp_file(suffix)
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        f.write(text)
+    return tmp_path
+
+
 @app.route("/save_lyrics", methods=["GET", "POST"])
 def save_lyrics():
     if request.method == "POST":
@@ -116,7 +133,7 @@ def align_song_full():
 
     try:
         # 1️⃣ Fetch and save lyrics and audio
-        lyrics_file = fetch_and_save(lyrics_url, ".txt")
+        lyrics_file = fetch_and_save_lyrics(lyrics_url)
         audio_file = fetch_and_save(audio_url, ".mp3")
 
         # 2️⃣ Convert MP3 -> WAV (mono, 16kHz)
@@ -227,7 +244,5 @@ import os
 
 
 if __name__ == "__main__":
-
-    print("🚀 Server started successfully.")
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
