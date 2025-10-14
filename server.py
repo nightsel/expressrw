@@ -53,28 +53,28 @@ def safe_temp_file(suffix=".txt"):
 
 @app.route("/save_lyrics", methods=["GET", "POST"])
 def save_lyrics():
-    # The URL of your JS lyrics route
-    lyrics_url = request.json.get("url")
-    if not lyrics_url:
-        return jsonify({"status": "error", "message": "No URL provided"}), 400
+    if request.method == "POST":
+        data = request.get_json()
+        url = data.get("url") if data else None
+    else:  # GET
+        url = request.args.get("url")
+
+    if not url:
+        return jsonify({"error": "Missing 'url' parameter"}), 400
 
     try:
-        res = requests.get(lyrics_url)
-        res.raise_for_status()
-        # Assume the response is a JSON array of strings
-        lyrics_lines = res.json()  # e.g., ["line 1", "line 2", ...]
-        if not isinstance(lyrics_lines, list) or not all(isinstance(l, str) for l in lyrics_lines):
-            return jsonify({"status": "error", "message": "Unexpected response format"}), 500
-    except requests.RequestException as e:
-        return jsonify({"status": "error", "message": f"Failed to fetch lyrics: {e}"}), 500
+        response = requests.get(url)
+        response.raise_for_status()
 
-    # Save lyrics to a temporary text file
-    tmp_path = safe_temp_file(".txt")
-    with open(tmp_path, "w", encoding="utf-8") as f:
-        f.write("\n".join(lyrics_lines))
+        lyrics_text = response.text
+        save_path = "/tmp/lyrics.txt"
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(lyrics_text)
 
-    return jsonify({"status": "ok", "path": tmp_path, "lines_saved": len(lyrics_lines)})
+        return jsonify({"message": "Lyrics saved successfully", "path": save_path})
 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 def chunk_lyrics(lyrics_lines, max_words=20):
     """Split lyrics into chunks of max_words"""
     chunks = []
