@@ -13,6 +13,22 @@ app = Flask(__name__)
 def home():
     return jsonify({"status": "ok", "message": "Python server is running"})
 
+TMP_DIR = "/tmp"
+CLEAN_INTERVAL = 15 * 60  # 15 minutes
+
+def cleanup_tmp():
+    while True:
+        for f in os.listdir(TMP_DIR):
+            try:
+                path = os.path.join(TMP_DIR, f)
+                if os.path.isfile(path):
+                    os.remove(path)
+            except Exception as e:
+                print(f"Failed to remove {f}: {e}")
+        time.sleep(CLEAN_INTERVAL)
+
+# Start the cleanup thread when the app starts
+threading.Thread(target=cleanup_tmp, daemon=True).start()
 
 @app.route("/download_audio", methods=["POST"])
 def download_audio():
