@@ -184,9 +184,9 @@ def align_song_full():
         task.log_file_path_absolute = "/tmp/aeneas_debug.log"
         ExecuteTask(task).execute()
         if os.path.exists("/tmp/aeneas_debug.log"):
-        with open("/tmp/aeneas_debug.log", "r", encoding="utf-8") as log:
-            print("📄 Aeneas log output:", file=sys.stderr)
-            print(log.read(), file=sys.stderr)
+            with open("/tmp/aeneas_debug.log", "r", encoding="utf-8") as log:
+                print("📄 Aeneas log output:", file=sys.stderr)
+                print(log.read(), file=sys.stderr)
         print("✅ Aeneas finished executing", file=sys.stderr)
 
         # 4️⃣ Read and parse sync file
