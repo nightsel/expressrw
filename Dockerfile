@@ -12,6 +12,11 @@ RUN apt-get update && apt-get install -y \
     libxslt1-dev \
     python3-dev \
     build-essential \
+    libatlas-base-dev \
+    libsndfile1-dev \
+    liblapack-dev \
+    gfortran \
+    pkg-config \
  && rm -rf /var/lib/apt/lists/*
 
 # --- Working directory ---
