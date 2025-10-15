@@ -15,26 +15,26 @@ RUN apt-get update && apt-get install -y \
 # --- Set working directory ---
 WORKDIR /app
 
-# --- Copy your requirements ---
-COPY requirements_aeneas.txt requirements.txt ./
+# --- Copy your requirements first ---
+COPY requirements.txt requirements_aeneas.txt ./
 
-# --- Install Python build essentials first ---
-RUN pip install --upgrade pip "setuptools<60" wheel cython
+# --- Install core Python build tools + numpy (required for aeneas build) ---
+RUN pip install --upgrade pip "setuptools<60" wheel cython numpy==1.23.5
 
-# --- Build and install aeneas from source with native extensions ---
+# --- Build and install aeneas from source with C extensions ---
 RUN git clone https://github.com/readbeyond/aeneas.git /tmp/aeneas && \
     cd /tmp/aeneas && \
     python setup.py build_ext --inplace && \
     python setup.py install && \
     cd / && rm -rf /tmp/aeneas
 
-# --- Install your app requirements ---
+# --- Install your app requirements (Flask, Gunicorn, Pydub, etc.) ---
 RUN pip install --no-cache-dir -r requirements.txt
 
-# --- Copy your app ---
+# --- Copy your app code ---
 COPY . .
 
-# --- Expose port and run server ---
+# --- Expose port and start server ---
 EXPOSE 5000
 ENV PORT=5000
 CMD gunicorn server:app --bind 0.0.0.0:$PORT --timeout 600
