@@ -2,6 +2,7 @@
 FROM python:3.10
 
 # Install system dependencies
+RUN apt-get update && apt-get install -y ffmpeg espeak
 RUN apt-get update && apt-get install -y \
     build-essential \
     espeak \
