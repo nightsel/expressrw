@@ -23,11 +23,7 @@ RUN pip install --upgrade pip "setuptools<60" wheel cython numpy==1.23.5
 RUN pip install --no-cache-dir -r requirements.txt
 
 # --- Build aeneas from source ---
-RUN git clone https://github.com/readbeyond/aeneas.git /tmp/aeneas && \
-    cd /tmp/aeneas && \
-    pip install . && \
-    python3 -m aeneas.diagnostics && \
-    cd / && rm -rf /tmp/aeneas
+RUN pip install git+https://github.com/readbeyond/aeneas.git@master
 
 # --- Copy your app code ---
 COPY . .
