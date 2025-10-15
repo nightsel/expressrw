@@ -17,15 +17,21 @@ RUN apt-get update && apt-get install -y \
 # --- Working directory ---
 WORKDIR /app
 
-# --- Copy and install Python dependencies ---
-COPY requirements.txt requirements_aeneas.txt ./
+# --- Create a virtual environment ---
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# --- Upgrade pip and install basic Python packages ---
 RUN pip install --upgrade pip "setuptools<60" wheel cython numpy==1.23.5
+
+# --- Copy and install requirements ---
+COPY requirements.txt requirements_aeneas.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# --- Install Aeneas from GitHub (C extensions included) ---
+# --- Install Aeneas from GitHub inside venv ---
 RUN pip install --no-cache-dir git+https://github.com/readbeyond/aeneas.git@master
 
-# --- Verify Aeneas installation ---
+# --- Verify Aeneas installation at runtime ---
 RUN python -m aeneas.diagnostics
 
 # --- Copy application code ---
@@ -34,4 +40,4 @@ COPY . .
 # --- Expose port and start server ---
 EXPOSE 5000
 ENV PORT=5000
-CMD gunicorn server:app --bind 0.0.0.0:$PORT --timeout 600
+CMD ["gunicorn", "server:app", "--bind", "0.0.0.0:$PORT", "--timeout", "600"]
