@@ -14,10 +14,9 @@ import subprocess
 import sys
 import logging
 
-logging.basicConfig(level=logging.DEBUG)  # sets up global debug logging
-logger = logging.getLogger("aeneas")
-logger.setLevel(logging.DEBUG)
-
+logging.basicConfig(level=logging.DEBUG)
+logging.getLogger("aeneas").setLevel(logging.DEBUG)
+logging.getLogger("aeneas").addHandler(logging.StreamHandler())
 
 
 app = Flask(__name__)
