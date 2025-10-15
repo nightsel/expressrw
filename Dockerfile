@@ -42,4 +42,4 @@ COPY . .
 
 # Expose port and start server
 EXPOSE 5000
-CMD ["gunicorn", "server:app", "--bind", "0.0.0.0:5000", "--timeout", "600"]
+CMD sh -c "gunicorn server:app --bind 0.0.0.0:$PORT --timeout 600"
