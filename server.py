@@ -189,7 +189,7 @@ def align_song_full():
         print("Lyrics exists:", os.path.exists(task.text_file_path_absolute), file=sys.stderr)
         print("Audio size:", os.path.getsize(task.audio_file_path_absolute), file=sys.stderr)
         print("Lyrics size:", os.path.getsize(task.text_file_path_absolute), file=sys.stderr)
-        task.configuration["log_level"] = "DEBUG"
+        task.configuration["log_level"] = "INFO"
         task.configuration["log_file_path_absolute"] = "/tmp/aeneas_debug.log"
         ExecuteTask(task).execute()
         if os.path.exists("/tmp/aeneas_debug.log"):
