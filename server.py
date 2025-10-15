@@ -212,7 +212,7 @@ def align_song_full():
         print(f"⚠️ Alignment failed: {e}", file=sys.stderr)
         return jsonify({"status": "error", "message": f"Alignment failed: {e}"})
 
-
+import io
 @app.route("/debug_audio", methods=["POST"])
 def debug_audio():
     """
