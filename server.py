@@ -179,7 +179,7 @@ def align_song_full():
             print("❌ Exported WAV file missing!", file=sys.stderr)
         else:
             print("✅ Exported WAV file exists, size:", os.path.getsize(audio_wav_file), file=sys.stderr)
-        task = Task(config_string="task_language=en|is_text_type=plain|os_task_file_format=json")
+        task = Task(config_string="task_language=en|is_text_type=plain|os_task_file_format=json|os_task_file_levels=DEBUG")
         task.audio_file_path_absolute = audio_wav_file
         task.text_file_path_absolute = lyrics_file
         task.sync_map_file_path_absolute = sync_file
@@ -189,7 +189,6 @@ def align_song_full():
         print("Lyrics exists:", os.path.exists(task.text_file_path_absolute), file=sys.stderr)
         print("Audio size:", os.path.getsize(task.audio_file_path_absolute), file=sys.stderr)
         print("Lyrics size:", os.path.getsize(task.text_file_path_absolute), file=sys.stderr)
-        task.configuration["log_level"] = "INFO"
         task.configuration["log_file_path_absolute"] = "/tmp/aeneas_debug.log"
         try:
             ExecuteTask(task).execute()
