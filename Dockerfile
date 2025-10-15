@@ -7,8 +7,14 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     espeak \
     libespeak-dev \
+    libespeak-ng1 \
+    libasound2 \
     ffmpeg \
     git \
+    python3-dev \
+    gcc \
+    make \
+    g++ \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -22,6 +28,8 @@ RUN pip install --upgrade pip "setuptools<60" wheel \
     && pip install "numpy<1.24" \
     && pip install --no-build-isolation -r requirements_aeneas.txt \
     && pip install -r requirements.txt
+
+RUN pip install --force-reinstall --no-binary :all: aeneas
 
 # Copy application code
 COPY . .
