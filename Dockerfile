@@ -17,21 +17,18 @@ RUN apt-get update && apt-get install -y \
 # --- Working directory ---
 WORKDIR /app
 
-# --- Copy and install dependencies ---
+# --- Copy and install Python dependencies ---
 COPY requirements.txt requirements_aeneas.txt ./
 RUN pip install --upgrade pip "setuptools<60" wheel cython numpy==1.23.5
 RUN pip install --no-cache-dir -r requirements.txt
 
-# --- Build aeneas from source ---
-RUN git clone https://github.com/readbeyond/aeneas.git /tmp/aeneas && \
-    cd /tmp/aeneas && \
-    export CFLAGS="-I/usr/include/python3.10 -I/usr/local/include/python3.10 -I/usr/local/lib/python3.10/site-packages/numpy/core/include" && \
-    python setup.py build_ext --force --inplace && \
-    python setup.py install && \
-    python -m aeneas.diagnostics && \
-    cd / && rm -rf /tmp/aeneas
+# --- Install Aeneas from GitHub (C extensions included) ---
+RUN pip install --no-cache-dir git+https://github.com/readbeyond/aeneas.git@master
 
-# --- Copy your app code ---
+# --- Verify Aeneas installation ---
+RUN python -m aeneas.diagnostics
+
+# --- Copy application code ---
 COPY . .
 
 # --- Expose port and start server ---
