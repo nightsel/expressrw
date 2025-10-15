@@ -191,7 +191,13 @@ def align_song_full():
         print("Lyrics size:", os.path.getsize(task.text_file_path_absolute), file=sys.stderr)
         task.configuration["log_level"] = "INFO"
         task.configuration["log_file_path_absolute"] = "/tmp/aeneas_debug.log"
-        ExecuteTask(task).execute()
+        try:
+            ExecuteTask(task).execute()
+        except Exception as e:
+            import traceback
+            print("💥 Aeneas internal traceback:", file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
+            raise
         if os.path.exists("/tmp/aeneas_debug.log"):
             print("📄 --- Aeneas debug log start ---", file=sys.stderr)
             with open("/tmp/aeneas_debug.log", "r", encoding="utf-8", errors="ignore") as log:
