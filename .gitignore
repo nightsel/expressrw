@@ -3,6 +3,8 @@
 *.pyo
 *.swp
 *.so
+*.wav
+luna*
 .pybuild
 aeneas.egg-info
 aeneas/build

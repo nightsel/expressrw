@@ -137,6 +137,7 @@ def align_song_full():
     {
         "lyrics_url": "...",
         "audio_url": "..."
+        "language": "eng"   # optional, defaults to "eng"
     }
     Returns: JSON of aligned lyrics
     """
@@ -144,6 +145,7 @@ def align_song_full():
     data = request.json
     lyrics_url = data.get("lyrics_url")
     audio_url = data.get("audio_url")
+    language = data.get("language", "eng")  # ✅ default to English
 
     try:
         # 1️⃣ Fetch and save lyrics and audio
@@ -179,6 +181,7 @@ def align_song_full():
             print("❌ Exported WAV file missing!", file=sys.stderr)
         else:
             print("✅ Exported WAV file exists, size:", os.path.getsize(audio_wav_file), file=sys.stderr)
+        """
         task = Task(config_string=(
             "task_language=eng|"
             "is_text_type=plain|"
@@ -198,13 +201,14 @@ def align_song_full():
         print("Lyrics exists:", os.path.exists(task.text_file_path_absolute), file=sys.stderr)
         print("Audio size:", os.path.getsize(task.audio_file_path_absolute), file=sys.stderr)
         print("Lyrics size:", os.path.getsize(task.text_file_path_absolute), file=sys.stderr)
+        """
 
         try:
             cmd = [
                 "python3", "-m", "aeneas.tools.execute_task",
                 audio_wav_file,
                 lyrics_file,
-                "task_language=eng|is_text_type=plain|os_task_file_format=json|log_level=TRACE",
+                f"task_language={language}|is_text_type=plain|os_task_file_format=json|log_level=TRACE",
                 sync_file
             ]
             print("🧠 Running Aeneas manually:", " ".join(cmd), file=sys.stderr)
