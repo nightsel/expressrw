@@ -25,8 +25,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # --- Build aeneas from source ---
 RUN git clone https://github.com/readbeyond/aeneas.git /tmp/aeneas && \
     cd /tmp/aeneas && \
-    python setup.py build_ext --inplace && \
+    python setup.py build_ext --force --inplace && \
     python setup.py install && \
+    ls -R /usr/local/lib/python3.10/site-packages/aeneas && \
     cd / && rm -rf /tmp/aeneas
 
 # --- Copy your app code ---
