@@ -213,6 +213,42 @@ def align_song_full():
         return jsonify({"status": "error", "message": f"Alignment failed: {e}"})
 
 
+@app.route("/debug_audio", methods=["POST"])
+def debug_audio():
+    """
+    Downloads the given audio (e.g., from /luna), converts it to WAV (mono, 16kHz),
+    and streams the WAV file directly back to the browser.
+    Example: POST { "audio_url": "https://expressproject-al0i.onrender.com/luna" }
+    """
+    try:
+        data = request.get_json()
+        audio_url = data.get("audio_url")
+        if not audio_url:
+            return jsonify({"error": "Missing 'audio_url'"}), 400
+
+        # Fetch original audio
+        resp = requests.get(audio_url)
+        resp.raise_for_status()
+
+        # Convert to WAV in-memory
+        audio = AudioSegment.from_file(io.BytesIO(resp.content))
+        audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
+
+        # Export WAV bytes
+        wav_io = io.BytesIO()
+        audio.export(wav_io, format="wav", codec="pcm_s16le")
+        wav_io.seek(0)
+
+        # Stream it to the browser
+        return send_file(
+            wav_io,
+            mimetype="audio/wav",
+            as_attachment=False,
+            download_name="debug_audio.wav"
+        )
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/align")
 def align_song():
