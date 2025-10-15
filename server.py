@@ -200,7 +200,17 @@ def align_song_full():
         print("Lyrics size:", os.path.getsize(task.text_file_path_absolute), file=sys.stderr)
 
         try:
-            ExecuteTask(task).execute()
+            cmd = [
+                "python3", "-m", "aeneas.tools.execute_task",
+                audio_wav_file,
+                lyrics_file,
+                "task_language=eng|is_text_type=plain|os_task_file_format=json|log_level=TRACE",
+                sync_file
+            ]
+            print("🧠 Running Aeneas manually:", " ".join(cmd), file=sys.stderr)
+            proc = subprocess.run(cmd, capture_output=True, text=True)
+            print("📄 Aeneas stdout:\n", proc.stdout, file=sys.stderr)
+            print("📄 Aeneas stderr:\n", proc.stderr, file=sys.stderr)
         except Exception as e:
             import traceback
             print("💥 Aeneas internal traceback:", file=sys.stderr)
