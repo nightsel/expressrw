@@ -169,10 +169,6 @@ def align_song_full():
             lines = f.readlines()  # splits on \n, \r\n, or \r
 
         print("Total lines:", len(lines), file=sys.stderr)
-        print("Audio exists:", os.path.exists(task.audio_file_path_absolute), file=sys.stderr)
-        print("Lyrics exists:", os.path.exists(task.text_file_path_absolute), file=sys.stderr)
-        print("Audio size:", os.path.getsize(task.audio_file_path_absolute), file=sys.stderr)
-        print("Lyrics size:", os.path.getsize(task.text_file_path_absolute), file=sys.stderr)
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
         task = Task(config_string="task_language=eng|is_text_type=plain|os_task_file_format=json|task_adjust_boundary_algorithm=percent|task_adjust_boundary_percent_value=50|task_log_level=debug")
@@ -182,6 +178,10 @@ def align_song_full():
 
         print("🔧 Running Aeneas alignment...", file=sys.stderr)
         task.log_file_path_absolute = "/tmp/aeneas_debug.log"
+        print("Audio exists:", os.path.exists(task.audio_file_path_absolute), file=sys.stderr)
+        print("Lyrics exists:", os.path.exists(task.text_file_path_absolute), file=sys.stderr)
+        print("Audio size:", os.path.getsize(task.audio_file_path_absolute), file=sys.stderr)
+        print("Lyrics size:", os.path.getsize(task.text_file_path_absolute), file=sys.stderr)
         ExecuteTask(task).execute()
         if os.path.exists("/tmp/aeneas_debug.log"):
             with open("/tmp/aeneas_debug.log", "r", encoding="utf-8") as log:
