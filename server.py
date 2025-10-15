@@ -12,8 +12,11 @@ import threading
 import uuid
 import subprocess
 import sys
+import logging
 
-
+logging.basicConfig(level=logging.DEBUG)  # sets up global debug logging
+logger = logging.getLogger("aeneas")
+logger.setLevel(logging.DEBUG)
 
 
 
