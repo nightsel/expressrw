@@ -27,8 +27,12 @@ RUN pip install --upgrade pip "setuptools<60" wheel \
     && pip install --no-build-isolation -r requirements_aeneas.txt \
     && pip install -r requirements.txt
 
-# ✅ Reinstall Aeneas with C extensions compiled
-RUN pip install --force-reinstall --no-binary aeneas aeneas
+RUN git clone https://github.com/readbeyond/aeneas.git /tmp/aeneas && \
+    cd /tmp/aeneas && \
+    python -m pip install --upgrade pip "setuptools<60" wheel && \
+    python setup.py build_ext --inplace && \
+    python setup.py install && \
+    cd / && rm -rf /tmp/aeneas
 
 COPY . .
 
