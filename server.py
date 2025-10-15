@@ -161,7 +161,7 @@ def align_song_full():
         audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
 
         # export to temp WAV for Aeneas
-        audio_wav_file = safe_temp_file(".wav")
+        audio_wav_file = os.path.join(os.getcwd(), "temp_audio.wav")
         audio.export(audio_wav_file, format="wav", codec="pcm_s16le")
         print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
         print("Audio duration (ms):", len(audio), file=sys.stderr)
