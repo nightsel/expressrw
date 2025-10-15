@@ -171,6 +171,14 @@ def align_song_full():
         print("Total lines:", len(lines), file=sys.stderr)
         # 3️⃣ Run Aeneas alignment
         sync_file = safe_temp_file(".json")
+        audio.export(audio_wav_file, format="wav", codec="pcm_s16le")
+        print(f"🔊 Audio converted to WAV: {audio_wav_file}", file=sys.stderr)
+
+        # ✅ Verify existence and size
+        if not os.path.exists(audio_wav_file):
+            print("❌ Exported WAV file missing!", file=sys.stderr)
+        else:
+            print("✅ Exported WAV file exists, size:", os.path.getsize(audio_wav_file), file=sys.stderr)
         task = Task(config_string="task_language=en|is_text_type=plain|os_task_file_format=json")
         task.audio_file_path_absolute = audio_wav_file
         task.text_file_path_absolute = lyrics_file
