@@ -32,7 +32,7 @@ kiwisolver==1.4.9
 kneed==0.8.5
 lazy_loader==0.4
 librosa==0.9.2
-llvmlite==0.45.1
+llvmlite==0.39.1
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 matplotlib==3.10.7
