@@ -33,8 +33,14 @@ RUN pip install --upgrade pip "setuptools<60" wheel cython numpy==1.23.5
 COPY requirements.txt requirements_aeneas.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# --- Install Aeneas from GitHub inside venv ---
-RUN pip install --no-cache-dir git+https://github.com/readbeyond/aeneas.git@master
+# --- Copy prebuilt Aeneas wheel into the container ---
+COPY wheelhouse/aeneas-*.whl /tmp/
+
+# --- Install the prebuilt wheel (with compiled C extensions) ---
+RUN pip install --no-cache-dir /tmp/aeneas-*.whl
+
+# --- Optional: remove the wheel to reduce image size ---
+RUN rm /tmp/aeneas-*.whl
 
 # --- Verify Aeneas installation at runtime ---
 RUN python -m aeneas.diagnostics
