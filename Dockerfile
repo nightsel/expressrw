@@ -3,14 +3,15 @@ FROM python:3.10
 
 # --- System dependencies ---
 RUN apt-get update && apt-get install -y \
-    git \
-    build-essential \
-    python3-dev \
+    ffmpeg \
+    espeak \
     libasound2-dev \
     libespeak-dev \
-    espeak \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+    libxml2-dev \
+    libxslt1-dev \
+    python3-dev \
+    build-essential \
+ && rm -rf /var/lib/apt/lists/*
 
 # --- Set working directory ---
 WORKDIR /app
